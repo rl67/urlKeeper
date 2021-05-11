@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const tagSchema = new Schema({
     name: {
         type: String,

@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const { graphqlHTTP } = require('express-graphql');
+const schema = require('./schema/schema');
 
 dotenv.config();        // Load environment variables
 
@@ -39,6 +41,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api', tagListRouter);
+app.use('/graphql', graphqlHTTP({
+  schema,
+  graphiql: true
+}));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

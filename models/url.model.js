@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const urlSchema = new Schema({
     url: {
         type: String,
