@@ -27,7 +27,7 @@ var tags = [
     { name: 'algorithm' ,id: '4', tagListId: '4' },
     { name: 'speedsNfeeds', id: '5', tagListId: '3' },
     { name: 'jigs', id: '6', tagListId: '1' },
-    { name: 'downTails', id: '7', tagListId: '2' }
+    { name: 'dowTails', id: '7', tagListId: '2' }
 ];
 
 var bookMarks = [
@@ -82,7 +82,7 @@ const BookMarkType = new GraphQLObjectType({
         tags: {
             type: new GraphQLList(TagType),
             resolve(parent, args) {
-                // 
+                return  _.filter(tags, {id: parent.tagId } );
             }
         }
     })
@@ -107,12 +107,34 @@ const RootQuery = new GraphQLObjectType({
                 return tagLists;
             }
         },
-        // Return a tag by its id
+        // Return a tag by id
         tag: {
             type: TagType,
             args: { id: { type: GraphQLID } },
             resolve(parent, args) {
                 return _.find(tags, { id: args.id });
+            }
+        },
+        // Return all tags
+        tags: {
+            type: new GraphQLList(TagType),
+            resolve(parent, args) {
+                return tags;
+            }
+        },
+        // Return a bookmark by index
+        bookMark: {
+            type: BookMarkType,
+            args: { id: { type: GraphQLID } },
+            resolve(parent, args) {
+                return _.find(bookMarks, { id: args.id } );
+            }
+        },
+        // Return all bookmarks
+        bookMarks: {
+            type: new GraphQLList(BookMarkType),
+            resolve(parent, args) {
+                return bookMarks;
             }
         }
     }
