@@ -24,7 +24,7 @@ const TagListType = new GraphQLObjectType( {
         tags: {
             type: new GraphQLList(TagType),
             resolve(parent, args) {
-                // return _.filter(tags, { tagListId: parent.id } )
+                return Tag.find({ tagListId: parent.id });
             }
         }
     })
@@ -39,7 +39,7 @@ const TagType = new GraphQLObjectType({
         tagList: { 
             type: TagListType, 
             resolve(parent, args) {
-                // return _.find(tagLists, { id: parent.tagListId });
+                return TagList.findById(parent.tagListId);
             }
         },
         bookmarks: {
@@ -138,12 +138,14 @@ const Mutation = new GraphQLObjectType({
         addTag: {
             type: TagType,
             args: {
-                name: { type: GraphQLString }
+                name: { type: GraphQLString },
+                tagListId: {type: GraphQLID }
             },
             resolve(parent, args){
                 // Create DB model object to store received object in the DB
                 let tag = new Tag({
                     name: args.name,
+                    tagListId: args.tagListId,
                 });
                 return tag.save();
             }
