@@ -1,22 +1,14 @@
 const mongoose = require('mongoose');
 
-const tagSchema = new Schema({
+const tagSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
     },
-    url: {
-        type: String,
-        required: true,
-    },
-    count: {
-        type: Number,
-        required: false,
-    },
-    tagList: {
-        type: Schema.Types.Objectid,
-        ref: "TagList",
-    },
+    // tagList: {
+    //     type: mongoose.Schema.Types.Objectid,
+    //     ref: "TagList",
+    // },
 }, {timestamp: true});
 
 const Tag = mongoose.model('Tag', tagSchema);

@@ -1,12 +1,16 @@
 const mongoose = require('mongoose');
 
-const urlSchema = new Schema({
+const urlSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+    },
     url: {
         type: String,
         required: true,
     },
     tags: [{
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Tag"
     }]
 }, {timestamp: true});

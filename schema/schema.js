@@ -1,4 +1,7 @@
 const graphql = require('graphql');
+const TagList = require('../models/tagList.model');
+const Tag = require('../models/tag.model');
+const Url = require('../models/url.model');
 const _ = require('lodash');
 
 
@@ -11,31 +14,6 @@ const {
     GraphQLList
 } = graphql;
 
-// dummy data
-var tagLists = [
-    { name: 'commonTags', id: '1' },
-    { name: 'woodworking', id: '2' },
-    { name: 'metalTurning', id: '3'},
-    { name: 'programming', id: '4'},
-    { name: 'workshop', id: '5'}
-];
-
-var tags = [
-    { name: 'toRead', id: '1', tagListId: '1' },
-    { name: 'planing', id: '2', tagListId: '2' },
-    { name: 'video', id: '3', tagListId: '1' },
-    { name: 'algorithm' ,id: '4', tagListId: '4' },
-    { name: 'speedsNfeeds', id: '5', tagListId: '3' },
-    { name: 'jigs', id: '6', tagListId: '1' },
-    { name: 'dowTails', id: '7', tagListId: '2' }
-];
-
-var bookMarks = [
-    { name: 'DZone', id: '1', tagId: '4' },
-    { name: 'Medium', id: '2', tagId: '1' },
-    { name: 'Rob Cosman', id: '3', tagId: '2'},
-    { name: 'Stumpy Nubs', id: '4', tagId: '1'}
-];
 
 // Tag list with its tags
 const TagListType = new GraphQLObjectType( {
@@ -46,7 +24,7 @@ const TagListType = new GraphQLObjectType( {
         tags: {
             type: new GraphQLList(TagType),
             resolve(parent, args) {
-                return _.filter(tags, { tagListId: parent.id } )
+                // return _.filter(tags, { tagListId: parent.id } )
             }
         }
     })
@@ -61,13 +39,13 @@ const TagType = new GraphQLObjectType({
         tagList: { 
             type: TagListType, 
             resolve(parent, args) {
-                return _.find(tagLists, { id: parent.tagListId });
+                // return _.find(tagLists, { id: parent.tagListId });
             }
         },
         bookmarks: {
             type: new GraphQLList(BookMarkType),
             resolve(parent, args) {
-                return _.filter(bookMarks, { tagId: parent.id })
+                // return _.filter(bookMarks, { tagId: parent.id })
             }
         }
     })
@@ -79,10 +57,11 @@ const BookMarkType = new GraphQLObjectType({
     fields: () => ({
         id: { type: GraphQLID },
         name: { type: GraphQLString },
+        url: { type: GraphQLString },
         tags: {
             type: new GraphQLList(TagType),
             resolve(parent, args) {
-                return  _.filter(tags, {id: parent.tagId } );
+                // return  _.filter(tags, {id: parent.tagId } );
             }
         }
     })
@@ -97,14 +76,14 @@ const RootQuery = new GraphQLObjectType({
             type: TagListType,
             args: { id: { type: GraphQLID } },
             resolve(parent, args) {
-                return _.find(tagLists, { id: args.id })
+                return TagList.findById(args.id);
             }
         },
         // Return all tagList objects
         tagLists: {
             type: new GraphQLList(TagListType),
             resolve(parent, args) {
-                return tagLists;
+                return TagList.find({});
             }
         },
         // Return a tag by id
@@ -112,14 +91,14 @@ const RootQuery = new GraphQLObjectType({
             type: TagType,
             args: { id: { type: GraphQLID } },
             resolve(parent, args) {
-                return _.find(tags, { id: args.id });
+                return Tag.findById(args.id);
             }
         },
         // Return all tags
         tags: {
             type: new GraphQLList(TagType),
             resolve(parent, args) {
-                return tags;
+                return Tag.find({});
             }
         },
         // Return a bookmark by index
@@ -127,19 +106,67 @@ const RootQuery = new GraphQLObjectType({
             type: BookMarkType,
             args: { id: { type: GraphQLID } },
             resolve(parent, args) {
-                return _.find(bookMarks, { id: args.id } );
+                return Url.findById(args.id);
             }
         },
         // Return all bookmarks
         bookMarks: {
             type: new GraphQLList(BookMarkType),
             resolve(parent, args) {
-                return bookMarks;
+                return Url.find({});
             }
         }
     }
 });
 
+const Mutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        addTagList: {
+            type: TagListType,
+            args: {
+                name: { type: GraphQLString }
+            },
+            resolve(parent, args){
+                // Create DB model object to store received object in the DB
+                let taglist = new TagList({
+                    name: args.name
+                });
+                return taglist.save();
+            }
+        },
+        addTag: {
+            type: TagType,
+            args: {
+                name: { type: GraphQLString }
+            },
+            resolve(parent, args){
+                // Create DB model object to store received object in the DB
+                let tag = new Tag({
+                    name: args.name,
+                });
+                return tag.save();
+            }
+        },
+        addBookmark: {
+            type: BookMarkType,
+            args: {
+                name: { type: GraphQLString },
+                url: { type: GraphQLString}
+            },
+            resolve(parent, args){
+                // Create DB model object to store received object in the DB
+                let bookmark = new Url({
+                    name: args.name,
+                    url: args.url
+                });
+                return bookmark.save();
+            }
+        }
+    }
+})
+
 module.exports = new GraphQLSchema({
-    query: RootQuery
+    query: RootQuery,
+    mutation: Mutation
 });
